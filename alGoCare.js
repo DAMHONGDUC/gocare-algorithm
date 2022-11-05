@@ -18,6 +18,12 @@ function getPrioritySuitable(result, priority) {
   return result.find((e) => e.priority === priority).id;
 }
 
+function getResponseFromId(id, dataAllTemplate, input) {
+  var response = dataAllTemplate.find((e) => e.id === id).content;
+  response = response.replaceAll(NAME_PLACEHOLER, input.arguments.name);
+  return response;
+}
+
 function getResponse(input, dataAllTemplate) {
   var result = [];
   var max = 0;
@@ -37,14 +43,18 @@ function getResponse(input, dataAllTemplate) {
     if (max < priorityCount) max = priorityCount;
   }
   if (countPrioritySuitable(result, max) == 1) {
-    let id = getPrioritySuitable(result, max);
-    response = dataAllTemplate.find((e) => e.id === id).content;
-    response = response.replaceAll(NAME_PLACEHOLER, input.arguments.name);
+    response = getResponseFromId(
+      getPrioritySuitable(result, max),
+      dataAllTemplate,
+      input
+    );
   } else if (countPrioritySuitable(result, max) > 1) {
     //console.log("have > 1 template suitable");
-    let id = getPrioritySuitable(result, max);
-    response = dataAllTemplate.find((e) => e.id === id).content;
-    response = response.replaceAll(NAME_PLACEHOLER, input.arguments.name);
+    response = getResponseFromId(
+      getPrioritySuitable(result, max),
+      dataAllTemplate,
+      input
+    );
   } else {
     //console.log("no template suitable");
     response = "Not Found";
