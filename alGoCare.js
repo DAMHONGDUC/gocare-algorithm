@@ -20,7 +20,7 @@ function getPrioritySuitable(result, priority) {
 
 function getResponseFromId(id, dataAllTemplate, input) {
   //specifyArgument
-  var result = specifyArgument("vocative", input.arguments);
+  var result = specifyArgument(ARGUMENT_KEY.xungho, input.arguments);
   //console.log(result);
 
   var response = dataAllTemplate.find((e) => e.id === id).content;
@@ -114,6 +114,8 @@ const SYS_DEFINE_ARGUMENT = [
     data: [{ male: "anh" }, { female: "chị" }],
   },
 ];
+
+const ARGUMENT_KEY = { xungho: "vocative" };
 
 function specifyArgument(neededKey, arguments) {
   var result;
@@ -217,10 +219,6 @@ function run() {
   // get response
   var response = getResponse(input, dataAllTemplate);
   console.log(response);
-
-  //specifyArgument
-  var result = specifyArgument("vocative", input.arguments);
-  console.log(result);
 }
 
 run();
