@@ -19,8 +19,15 @@ function getPrioritySuitable(result, priority) {
 }
 
 function getResponseFromId(id, dataAllTemplate, input) {
+  //specifyArgument
+  var result = specifyArgument("vocative", input.arguments);
+  //console.log(result);
+
   var response = dataAllTemplate.find((e) => e.id === id).content;
-  response = response.replaceAll(NAME_PLACEHOLER, input.arguments.name);
+  response = response.replaceAll(
+    NAME_PLACEHOLER,
+    result + " " + input.arguments.name
+  );
   return response;
 }
 
