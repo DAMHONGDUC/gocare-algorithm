@@ -29,16 +29,20 @@ function getResponse(input, dataAllTemplate) {
   var max = 0;
   var response;
   var message = input.message;
+
   for (let data of dataAllTemplate) {
     let priorityCount = 0;
+
     for (let trigger of data.triggers) {
       let messageConverted = removeVietnameseTones(message).toLowerCase();
       let keywordConverted = removeVietnameseTones(
         trigger.keyword
       ).toLowerCase();
+
       if (messageConverted.includes(keywordConverted))
         priorityCount = priorityCount + trigger.priority;
     }
+
     result.push({ id: data.id, priority: priorityCount });
     if (max < priorityCount) max = priorityCount;
   }
@@ -95,6 +99,37 @@ function removeVietnameseTones(str) {
 }
 
 const NAME_PLACEHOLER = "{{name}}";
+
+const SYS_DEFINE_ARGUMENT = [
+  {
+    name: "vocative",
+    compareField: "gender",
+    data: [{ male: "anh" }, { female: "chị" }],
+  },
+];
+
+function specifyArgument(neededKey, arguments) {
+  var result;
+  var elm = SYS_DEFINE_ARGUMENT.find((e) => e.name === neededKey);
+  //console.log(elm);
+
+  if (elm !== null && elm !== "" && elm !== undefined) {
+    let field = elm.compareField;
+    let data = elm.data;
+    let dataArgument = arguments[field];
+    // console.log(dataArgument);
+    // console.log(data);
+
+    for (let element of data) {
+      result = element[dataArgument];
+      if (result !== null && result !== "" && result !== undefined) {
+        break;
+      }
+    }
+  } else result = "Not Found";
+
+  return result;
+}
 
 function run() {
   // example data
@@ -170,11 +205,15 @@ function run() {
   // add template: phần add này dùng hàm hẹ thống
   addTemplate(dataAllTemplate, dataTemplate1);
   addTemplate(dataAllTemplate, dataTemplate2);
-  //console.log(dataAllTemplate);
+  console.log(dataAllTemplate);
 
   // get response
   var response = getResponse(input, dataAllTemplate);
   console.log(response);
+
+  //specifyArgument
+  var result = specifyArgument("vocative", input.arguments);
+  console.log(result);
 }
 
 run();
