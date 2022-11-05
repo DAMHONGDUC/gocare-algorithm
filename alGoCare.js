@@ -30,7 +30,8 @@ function getResponse(input, dataAllTemplate) {
       let keywordConverted = removeVietnameseTones(
         trigger.keyword
       ).toLowerCase();
-      if (messageConverted.includes(keywordConverted)) priorityCount++;
+      if (messageConverted.includes(keywordConverted))
+        priorityCount = priorityCount + trigger.priority;
     }
     result.push({ id: data.id, priority: priorityCount });
     if (max < priorityCount) max = priorityCount;
