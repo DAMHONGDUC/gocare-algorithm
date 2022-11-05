@@ -20,7 +20,7 @@ function getPrioritySuitable(result, priority) {
 
 function getResponseFromId(id, dataAllTemplate, input) {
   //specifyArgument
-  var result = specifyArgument(ARGUMENT_KEY.xungho, input.arguments);
+  var result = specifyArgument(ARGUMENT_KEY.vocative, input.arguments);
   //console.log(result);
 
   var response = dataAllTemplate.find((e) => e.id === id).content;
@@ -115,7 +115,7 @@ const SYS_DEFINE_ARGUMENT = [
   },
 ];
 
-const ARGUMENT_KEY = { xungho: "vocative" };
+const ARGUMENT_KEY = { vocative: "vocative" };
 
 function specifyArgument(neededKey, arguments) {
   var result;
