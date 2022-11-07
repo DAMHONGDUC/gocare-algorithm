@@ -1,9 +1,5 @@
 function addTemplate(dataAllTemplate, data) {
-  if (dataAllTemplate.push(data)) {
-    return true;
-  } else {
-    return false;
-  }
+  dataAllTemplate.push(data);
 }
 
 function countPrioritySuitable(result, max) {
@@ -19,23 +15,24 @@ function getPrioritySuitable(result, priority) {
 }
 
 function getResponseFromId(id, dataAllTemplate, input) {
-  //specifyArgument
-  var result = specifyArgument(ARGUMENT_KEY.vocative, input.arguments);
-  //console.log(result);
+  let result = specifyArgument(KEY_ARGUMENT.vocative, input.arguments);
+  let replaceText = "";
+  if (result !== null && result !== "" && result !== undefined)
+    replaceText = result + " ";
 
-  var response = dataAllTemplate.find((e) => e.id === id).content;
+  let response = dataAllTemplate.find((e) => e.id === id).content;
   response = response.replaceAll(
     NAME_PLACEHOLER,
-    result + " " + input.arguments.name
+    replaceText + input.arguments.name
   );
   return response;
 }
 
 function getResponse(input, dataAllTemplate) {
-  var result = [];
-  var max = 0;
-  var response;
-  var message = input.message;
+  let result = [];
+  let max = 0;
+  let response;
+  let message = input.message;
 
   for (let data of dataAllTemplate) {
     let priorityCount = 0;
@@ -50,9 +47,13 @@ function getResponse(input, dataAllTemplate) {
         priorityCount = priorityCount + trigger.priority;
     }
 
-    result.push({ id: data.id, priority: priorityCount });
-    if (max < priorityCount) max = priorityCount;
+    if (priorityCount >= data.threshold) {
+      result.push({ id: data.id, priority: priorityCount });
+
+      if (max < priorityCount) max = priorityCount;
+    }
   }
+
   if (countPrioritySuitable(result, max) == 1) {
     response = getResponseFromId(
       getPrioritySuitable(result, max),
@@ -60,16 +61,13 @@ function getResponse(input, dataAllTemplate) {
       input
     );
   } else if (countPrioritySuitable(result, max) > 1) {
-    //console.log("have > 1 template suitable");
     response = getResponseFromId(
       getPrioritySuitable(result, max),
       dataAllTemplate,
       input
     );
-  } else {
-    //console.log("no template suitable");
-    response = "Not Found";
   }
+
   return response;
 }
 
@@ -107,7 +105,7 @@ function removeVietnameseTones(str) {
 
 const NAME_PLACEHOLER = "{{name}}";
 
-const SYS_DEFINE_ARGUMENT = [
+const SYS_ARGUMENT = [
   {
     name: "vocative",
     compareField: "gender",
@@ -115,19 +113,16 @@ const SYS_DEFINE_ARGUMENT = [
   },
 ];
 
-const ARGUMENT_KEY = { vocative: "vocative" };
+const KEY_ARGUMENT = { vocative: "vocative" };
 
 function specifyArgument(neededKey, arguments) {
-  var result;
-  var elm = SYS_DEFINE_ARGUMENT.find((e) => e.name === neededKey);
-  //console.log(elm);
+  let result;
+  let elm = SYS_ARGUMENT.find((e) => e.name === neededKey);
 
   if (elm !== null && elm !== "" && elm !== undefined) {
     let field = elm.compareField;
     let data = elm.data;
     let dataArgument = arguments[field];
-    // console.log(dataArgument);
-    // console.log(data);
 
     for (let element of data) {
       result = element[dataArgument];
@@ -135,14 +130,14 @@ function specifyArgument(neededKey, arguments) {
         break;
       }
     }
-  } else result = "Not Found";
+  }
 
   return result;
 }
 
 function run() {
   // example data
-  var dataTemplate1 = {
+  let dataTemplate1 = {
     id: 1,
     type: 1,
     name: "Chẩn đoán COVID",
@@ -170,7 +165,7 @@ function run() {
     threshold: 15,
   };
 
-  var dataTemplate2 = {
+  let dataTemplate2 = {
     id: 2,
     type: 1,
     name: "Chẩn đoán Viêm Gan",
@@ -198,7 +193,7 @@ function run() {
     threshold: 15,
   };
 
-  var input = {
+  let input = {
     message:
       "toi gan day bi mat vi giac, va nhieu luc bi ho khan nua. bac si tu van giup toi voi",
     arguments: {
@@ -209,16 +204,18 @@ function run() {
   };
 
   // an array that store all template
-  var dataAllTemplate = [];
+  let dataAllTemplate = [];
 
   // add template: phần add này dùng hàm hẹ thống
   addTemplate(dataAllTemplate, dataTemplate1);
   addTemplate(dataAllTemplate, dataTemplate2);
-  console.log(dataAllTemplate);
+  //console.log(dataAllTemplate);
 
   // get response
-  var response = getResponse(input, dataAllTemplate);
-  console.log(response);
+  let response = getResponse(input, dataAllTemplate);
+  if (response !== null && response !== "" && response !== undefined)
+    console.log(response);
+  else console.log("Response Not Found");
 }
 
 run();
